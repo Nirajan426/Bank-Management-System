@@ -1,8 +1,10 @@
 
-#include<stdlib.h>
-#include<unistd.h>
-#include<stdio.h>
-#include<time.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <time.h>
+#include <ctype.h>
+#include <string.h>
 
 // Structure to store user details
 struct User
@@ -18,6 +20,7 @@ void packt();
 void bflus();
 void header();
 void boot();
+int isValidPassword(char *password);
 void createAccount();
 int login(struct User *user);
 void depositMoney(struct User *user);
@@ -31,12 +34,13 @@ int main()
     struct User currentUser;
     int choice;
     boot();
-    mainmenu:
+mainmenu:
     header();
     // Ask for account creation or login
     printf("\t - - SYSTEM DASH - - \n");
     printf("\t1. Create Account\n");
     printf("\t2. Login\n");
+    printf("\t3. Exit\n");
 
     printf("\tEnter your choice: ");
     scanf("%d", &choice);
@@ -55,9 +59,14 @@ int main()
             goto mainmenu;
         }
     }
+    else if (choice==3)
+    {
+        exit(0);
+    }
+    
     else
     {
-        printf("\tInvalid choice.Enter 1 or 2\n\n");
+        printf("\tInvalid choice\n\n");
         printf("Press any key to continue.");
         getch();
         goto mainmenu;
@@ -72,7 +81,8 @@ int main()
         printf("\t1. Deposit Money\n");
         printf("\t2. Withdraw Money\n");
         printf("\t3. Account Statement\n");
-        printf("\t4. Exit\n");
+        printf("\t4. Log Out\n");
+        printf("\t5. Exit\n");
         printf("\tEnter your choice: ");
         scanf("%d", &choice);
         bflus();
@@ -89,6 +99,9 @@ int main()
             accountStatement(&currentUser);
             break;
         case 4:
+            goto mainmenu;
+            break;
+        case 5:
             printf("\tExiting the program. Goodbye!\n");
             exit(0);
         default:
@@ -128,8 +141,20 @@ void createAccount()
     printf("\tEnter a username: ");
     scanf("%s", newUser.username);
     bflus();
-    printf("\tEnter a password: ");
-    scanf("%s", newUser.password);
+    while (1)
+    {
+
+        printf("\tEnter a valid  password: ");
+        scanf("%s", newUser.password);
+        if (isValidPassword(newUser.password) != 1)
+        {
+            printf("Error!\n");
+        }
+
+        else
+            break;
+    }
+
     bflus();
 
     newUser.accountNumber = lastAccNo + 1;
@@ -212,7 +237,6 @@ void depositMoney(struct User *user)
     user->balance += amount;
     printf("\tDeposit successful. New balance: %.2f\n", user->balance);
 
-
     // Log the transaction
     logTransaction(user->accountNumber, "DEPOSIT", amount, user->balance);
 
@@ -243,7 +267,7 @@ void withdrawMoney(struct User *user)
     {
         printf("\tInsufficient balance.\n");
         packt();
-        return ;
+        return;
     }
 
     user->balance -= amount;
@@ -290,7 +314,6 @@ void accountStatement(struct User *user)
         }
     }
     packt();
-
 }
 
 // Function to log transactions
@@ -349,35 +372,38 @@ void updateUserBalance(struct User *user)
     rename("temp.txt", "userdetail.txt");
 }
 
-//Press any key to continue
-void packt(){
+// Press any key to continue
+void packt()
+{
     printf("\tPress any key to continue.");
     getch();
 }
 
-//Buffer Flush
-void bflus(){
-    //Buffer Flush
+// Buffer Flush
+void bflus()
+{
+    // Buffer Flush
     int ch;
-    while ((ch = getchar()) != '\n' && ch != EOF);
+    while ((ch = getchar()) != '\n' && ch != EOF)
+        ;
 }
 
-
-
-//Organization's Header                     --Ready
-void header(){
+// Organization's Header                     --Ready
+void header()
+{
     system("cls");
     printf("\n");
     printf("\t\t\t|| NAM BANK ||\n");
     printf("\n");
     printf("\t---------- Bank Management System ----------");
-    //printf("\n====================================================");
+    // printf("\n====================================================");
     printf("\n\t___________________________________________________________");
     printf("\n");
 }
 
-//boot graphics
-void boot(){
+// boot graphics
+void boot()
+{
     printf("\n\n\n\n");
     printf("\t\t\tNNNN    N  AAAAA  M    M      BBBBB    AAAAA  NNNN    N  K   K\n");
     printf("\t\t\tN   N   N  A   A  MM  MM      B    B   A   A  N   N   N  K  K\n");
@@ -388,12 +414,33 @@ void boot(){
     sleep(1);
     printf("\t\t\t");
 
-    for(int i=0;i<62;i++){
+    for (int i = 0; i < 62; i++)
+    {
         printf("_");
         usleep(1000);
     }
     usleep(100000);
 }
+int isValidPassword(char *password)
+{
+    int length = 0, hasUpper = 0, hasLower = 0, hasDigit = 0, hasSpecial = 0;
+    char specialChars[] = "@$!%*?&";
 
+    length = strlen(password);
+    if (length < 8)
+        return 0; // Password must be at least 8 characters long
 
+    for (int i = 0; i < length; i++)
+    {
+        if (isupper(password[i]))
+            hasUpper = 1;
+        if (islower(password[i]))
+            hasLower = 1;
+        if (isdigit(password[i]))
+            hasDigit = 1;
+        if (strchr(specialChars, password[i])) // check the character in string and return pointer if found
+            hasSpecial = 1;
+    }
 
+    return (hasUpper && hasLower && hasDigit && hasSpecial); // logic AND (&&), Return 1 if every values has 1
+}
