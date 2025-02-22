@@ -34,4 +34,4 @@ The system securely **updates balances** and **logs transactions** to ensure acc
 ### Requirements 🛠
 - C Compiler (e.g., GCC)
 - Standard C libraries (`stdio.h`, `stdlib.h`, `time.h`, `unistd.h`)
-- Maile lekheko aayo (Kabindra)
+
