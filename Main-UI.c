@@ -20,6 +20,7 @@ void packt();
 void bflus();
 void header();
 void boot();
+int isValidUsername(char *username);
 int isValidPassword(char *password);
 void createAccount();
 int login(struct User *user);
@@ -59,11 +60,11 @@ mainmenu:
             goto mainmenu;
         }
     }
-    else if (choice==3)
+    else if (choice == 3)
     {
         exit(0);
     }
-    
+
     else
     {
         printf("\tInvalid choice\n\n");
@@ -137,9 +138,20 @@ void createAccount()
     {
         lastAccNo = 1000; // Default starting account number
     }
-
-    printf("\tEnter a username: ");
+while (1)
+{
+     printf("\tEnter a valid username: ");
     scanf("%s", newUser.username);
+    if (isValidUsername(newUser.username) != 1)
+    {
+        printf("Error! username must be 5-15 characters long and start with a letter\n");
+    }
+
+    else
+        break;
+}
+
+   
     bflus();
     while (1)
     {
@@ -236,14 +248,13 @@ void depositMoney(struct User *user)
 
     user->balance += amount;
     printf("\tDeposit successful. New balance: %.2f\n", user->balance);
-
+    packt();
     // Log the transaction
     logTransaction(user->accountNumber, "DEPOSIT", amount, user->balance);
 
     // Update user balance in the file
     updateUserBalance(user);
-    printf("Press any key to continue.");
-    getch();
+   
 }
 
 // Function to withdraw money
@@ -272,7 +283,7 @@ void withdrawMoney(struct User *user)
 
     user->balance -= amount;
     printf("\tWithdrawal successful. New balance: %.2f\n", user->balance);
-
+    packt();
     // Log the transaction
     logTransaction(user->accountNumber, "WITHDRAW", amount, user->balance);
 
@@ -443,4 +454,15 @@ int isValidPassword(char *password)
     }
 
     return (hasUpper && hasLower && hasDigit && hasSpecial); // logic AND (&&), Return 1 if every values has 1
+}
+int isValidUsername(char *username)
+{
+    int length = strlen(username);
+
+    // Check length (5-15 characters)
+    if (length < 5 || length > 15 || (isalpha(username[0]) != 1))
+    {
+        return 0;
+    }
+    return 1; // Valid username
 }
