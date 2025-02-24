@@ -1,4 +1,3 @@
-
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -138,20 +137,19 @@ void createAccount()
     {
         lastAccNo = 1000; // Default starting account number
     }
-while (1)
-{
-     printf("\tEnter a valid username: ");
-    scanf("%s", newUser.username);
-    if (isValidUsername(newUser.username) != 1)
+    while (1)
     {
-        printf("Error! username must be 5-15 characters long and start with a letter\n");
+        printf("\tEnter a valid username: ");
+        scanf("%s", newUser.username);
+        if (isValidUsername(newUser.username) != 1)
+        {
+            printf("Error! \n");
+        }
+
+        else
+            break;
     }
 
-    else
-        break;
-}
-
-   
     bflus();
     while (1)
     {
@@ -190,6 +188,8 @@ while (1)
 // Function to authenticate user
 int login(struct User *user)
 {
+    printf("Debug: Entering login function\n");
+
     int accountNumber;
     char username[50];
     char password[50];
@@ -205,6 +205,8 @@ int login(struct User *user)
     }
 
     printf("\tEnter your account number: ");
+    printf("Debug: Account number input prompt displayed\n");
+
     scanf("%d", &accountNumber);
     bflus();
     printf("\tEnter your username: ");
@@ -254,7 +256,6 @@ void depositMoney(struct User *user)
 
     // Update user balance in the file
     updateUserBalance(user);
-   
 }
 
 // Function to withdraw money
@@ -330,6 +331,7 @@ void accountStatement(struct User *user)
 // Function to log transactions
 void logTransaction(int accountNumber, const char *type, float amount, float balance)
 {
+    
     FILE *file = fopen("transaction_log.txt", "a");
     header();
 
