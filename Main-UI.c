@@ -460,7 +460,7 @@ int isValidUsername(char *username)
     int length = strlen(username);
 
     // Check length (5-15 characters)
-    if (length < 5 || length > 15 || (isalpha(username[0]) != 1))
+    if (length < 5 || length > 40 || (isalpha(username[0]) != 1))
     {
         return 0;
     }
