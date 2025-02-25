@@ -1,8 +1,11 @@
 
 #include<stdlib.h>
-#include<unistd.h>
 #include<stdio.h>
+#include <windows.h>
 #include<time.h>
+#include<string.h>
+#include<conio.h>
+#include <unistd.h> 
 
 // Structure to store user details
 struct User
@@ -10,6 +13,7 @@ struct User
     int accountNumber;
     char username[50];
     char password[50];
+    char phone[15];
     float balance;
 };
 
@@ -102,55 +106,56 @@ int main()
 }
 
 // Function to create a new account
-void createAccount()
-{
-    struct User newUser;
-    FILE *file = fopen("userdetail.txt", "a");
+void createAccount() {
+    struct User newUser,temp;
     FILE *f;
-    int lastAccNo = 1000;
-    header();
-
-    // Open the user details file to find the last account number
-    f = fopen("userdetail.txt", "r");
-    if (f != NULL)
-    {
-        while (fscanf(f, "%d %s %s %f", &newUser.accountNumber, newUser.username, newUser.password, &newUser.balance) != EOF)
+    int lastno = 12345677;
+    printf("=====Creat Account=====\n");
+    f=fopen("userdetail.txt","r");
+        if(f!=NULL)
         {
-            lastAccNo = newUser.accountNumber;
+             while (fscanf(f, "%d %s %s %s", &newUser.accountNumber, newUser.username, newUser.phone, newUser.password) != EOF)
+			 {
+              if(newUser.accountNumber>lastno)
+              {
+                lastno=newUser.accountNumber;
+              }
+        }
+        }
+    fclose(f);
+    lastno++;
+    newUser.accountNumber = lastno;
+    printf("Please enter your full name: ");
+    scanf(" %[^\n]",newUser.username);
+    printf("Please enter your phone number: ");
+    scanf(" %s", newUser.phone);
+    f=fopen("userdetail.txt","r");
+    if(f!=NULL){
+	    
+         while (fscanf(f, "%d %s %s %s", &temp.accountNumber, temp.username, temp.phone, temp.password) != EOF) 
+        {
+            if(strcmp(temp.phone,newUser.phone)==0)
+            {
+                printf("With this phone the account already exist\n");
+                fclose(f);
+                return;
+            }
         }
         fclose(f);
     }
-    else
+    printf("Please enter your password: ");
+    scanf(" %s", newUser.password);
+    f=fopen("userdetail.txt","a");
+    if(f==NULL)
     {
-        lastAccNo = 1000; // Default starting account number
+        f=fopen("userdetail.txt","w");
     }
-
-    printf("\tEnter a username: ");
-    scanf("%s", newUser.username);
-    bflus();
-    printf("\tEnter a password: ");
-    scanf("%s", newUser.password);
-    bflus();
-
-    newUser.accountNumber = lastAccNo + 1;
-    newUser.balance = 0.0;
-
-    // Save user details to file
-    if (file == NULL)
-    {
-        printf("\tError opening user details file.\n");
-        return;
-    }
-    fprintf(file, "%d %s %s %.2f\n", newUser.accountNumber, newUser.username, newUser.password, newUser.balance);
-    fclose(file);
-
-    printf("\tAccount created successfully!\n");
+    fprintf(f, "%d \t%s \t%s \t%s\n", newUser.accountNumber, newUser.username, newUser.phone, newUser.password);
+    printf("Account created successfully!\n");
     printf("\tYour account number is: %d\n", newUser.accountNumber);
-    printf("Press any key to continue.");
-    getch();
+    fclose(f);
 }
-
-// Function to authenticate user
+//Function to authenticate user
 int login(struct User *user)
 {
     int accountNumber;
@@ -394,6 +399,5 @@ void boot(){
     }
     usleep(100000);
 }
-
 
 
