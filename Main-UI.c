@@ -48,6 +48,13 @@ mainmenu:
     if (choice == 1)
     {
         createAccount();
+        if (login(&currentUser) != 1) // 1 for success and 0 for fail
+        {
+
+            printf("\tLogin failed.Try  again with different details.\n\t");
+            packt();
+            goto mainmenu;
+        }
     }
     else if (choice == 2)
     {
@@ -181,14 +188,13 @@ void createAccount()
 
     printf("\tAccount created successfully!\n");
     printf("\tYour account number is: %d\n", newUser.accountNumber);
-    printf("Press any key to continue.");
+    printf("Press any key to procced to Login Page.");
     getch();
 }
 
 // Function to authenticate user
 int login(struct User *user)
 {
-    printf("Debug: Entering login function\n");
 
     int accountNumber;
     char username[50];
@@ -205,8 +211,6 @@ int login(struct User *user)
     }
 
     printf("\tEnter your account number: ");
-    printf("Debug: Account number input prompt displayed\n");
-
     scanf("%d", &accountNumber);
     bflus();
     printf("\tEnter your username: ");
@@ -331,7 +335,7 @@ void accountStatement(struct User *user)
 // Function to log transactions
 void logTransaction(int accountNumber, const char *type, float amount, float balance)
 {
-    
+
     FILE *file = fopen("transaction_log.txt", "a");
     header();
 
@@ -461,7 +465,7 @@ int isValidUsername(char *username)
 {
     int length = strlen(username);
 
-    // Check length (5-15 characters)
+    // Check length (5-15 charters)
     if (length < 5 || length > 40 || (isalpha(username[0]) != 1))
     {
         return 0;
