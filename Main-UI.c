@@ -19,8 +19,10 @@ void packt();
 void bflus();
 void header();
 void boot();
-int isValidUsername(char *username);
-int isValidPassword(char *password);
+void viewinfo(struct User *user);
+void changePassword(struct User *user);    // yet to program this code
+void changeEmail(struct User *user);       // yet to program this code
+void changePhoneNumber(struct User *user); // yet to program this code
 void createAccount();
 int login(struct User *user);
 void depositMoney(struct User *user);
@@ -28,13 +30,14 @@ void withdrawMoney(struct User *user);
 void accountStatement(struct User *user);
 void logTransaction(int accountNumber, const char *type, float amount, float balance);
 void updateUserBalance(struct User *user);
-
+int isValidUsername(char *username);
+int isValidPassword(char *password);
 int main()
 {
     struct User currentUser;
     int choice;
     boot();
-mainmenu:
+mainmenu1:
     header();
     // Ask for account creation or login
     printf("\t - - SYSTEM DASH - - \n");
@@ -53,7 +56,7 @@ mainmenu:
 
             printf("\tLogin failed.Try  again with different details.\n\t");
             packt();
-            goto mainmenu;
+            goto mainmenu1;
         }
     }
     else if (choice == 2)
@@ -63,7 +66,7 @@ mainmenu:
 
             printf("\tLogin failed.Try  again with different details.\n\t");
             packt();
-            goto mainmenu;
+            goto mainmenu1;
         }
     }
     else if (choice == 3)
@@ -76,10 +79,11 @@ mainmenu:
         printf("\tInvalid choice\n\n");
         printf("Press any key to continue.");
         getch();
-        goto mainmenu;
+        goto mainmenu1;
     }
 
-    // Banking menu for logged-in users
+// Banking menu for logged-in users
+mainmenu2:
     while (1)
     {
         header();
@@ -88,8 +92,9 @@ mainmenu:
         printf("\t1. Deposit Money\n");
         printf("\t2. Withdraw Money\n");
         printf("\t3. Account Statement\n");
-        printf("\t4. Log Out\n");
-        printf("\t5. Exit\n");
+        printf("\t4. Setting\n");
+        printf("\t5. Log Out\n");
+        printf("\t6. Exit\n");
         printf("\tEnter your choice: ");
         scanf("%d", &choice);
         bflus();
@@ -106,9 +111,47 @@ mainmenu:
             accountStatement(&currentUser);
             break;
         case 4:
-            goto mainmenu;
+            while (1)
+            {
+
+                printf("\t - - - SETTINGS - - - \n");
+                printf("\t1.Personal Information \n");
+                printf("\t2. Change Password\n");
+                printf("\t3. Change Email\n");
+                printf("\t4. Change Phone Number\n");
+                printf("\t5. Back\n");
+                printf("\tEnter your choice: ");
+                scanf("%d", &choice);
+                bflus();
+                switch (choice)
+                {
+                case 1:
+                    viewinfo(&currentUser);
+                    break;
+                case 2:
+                    changePassword(&currentUser);
+                    break;
+                case 3:
+                    changeEmail(&currentUser);
+                    break;
+                case 4:
+                    changePhoneNumber(&currentUser);
+                    break;
+
+                case 5:
+                    goto mainmenu2;
+                default:
+
+                    printf("\tInvalid choice. Please try again.\n");
+                    printf("Press any key to continue.");
+                    getch();
+                }
+            }
             break;
         case 5:
+            goto mainmenu1;
+            break;
+        case 6:
             printf("\tExiting the program. Goodbye!\n");
             exit(0);
         default:
@@ -165,7 +208,7 @@ void createAccount()
         scanf("%s", newUser.password);
         if (isValidPassword(newUser.password) != 1)
         {
-            printf("Error!\n");
+            printf("\tError! Weak password. Try again.\n");
         }
 
         else
@@ -471,4 +514,22 @@ int isValidUsername(char *username)
         return 0;
     }
     return 1; // Valid username
+}
+
+// not completed.........................
+void viewinfo(struct User *user)
+{
+    printf("Hello");
+}
+void changePassword(struct User *user)
+{
+    printf("Opps! Comming soon...");
+}
+void changeEmail(struct User *user)
+{
+    printf("Opps! Comming soon...");
+}
+void changePhoneNumber(struct User *user)
+{
+    printf("Opps! Comming soon...");
 }
