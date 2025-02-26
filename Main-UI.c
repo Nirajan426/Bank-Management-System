@@ -182,12 +182,16 @@ void createAccount()
         {
             lastAccNo = newUser.accountNumber;
         }
+
         fclose(f);
     }
+
+    // Getting user inputs
+    // Getting user Full name
     while (1)
     {
-        printf("\tEnter a valid username: ");
-        scanf("%s", newUser.username);
+        printf("\tEnter your full name: ");
+        scanf("%s", newUser.username); //%[^\n]
         if (isValidUsername(newUser.username) != 1)
         {
             printf("Error! \n");
@@ -197,12 +201,13 @@ void createAccount()
             break;
     }
     bflus();
-    f=fopen("userdetail.txt","r");
-    if(f!=NULL){
-	    
-         while (fscanf(f, "%d %s %s %s", &temp.accountNumber, temp.username, temp.phone, temp.password) != EOF) 
+    f = fopen("userdetail.txt", "r");
+    if (f != NULL)
+    {
+
+        while (fscanf(f, "%d %s %s %s %f", &temp.accountNumber, temp.username, temp.phone, temp.password, &temp.balance) != EOF)
         {
-            if(strcmp(temp.phone,newUser.phone)==0)
+            if (strcmp(temp.phone, newUser.phone) == 0)
             {
                 printf("With this phone the account already exist\n");
                 fclose(f);
@@ -211,15 +216,19 @@ void createAccount()
         }
         fclose(f);
     }
+    // Get valid phone number
+    printf("\tEnter your phone number: ");
+    scanf("%s", newUser.phone);
     bflus();
+  
     while (1)
     {
 
-        printf("\tEnter a valid  password: ");
+        printf("\tEnter a valid and strong password: ");
         scanf("%s", newUser.password);
         if (isValidPassword(newUser.password) != 1)
         {
-            printf("\tError! Weak password. Try again.\n");
+            printf("\tError! Too weak password. Try again.\n");
         }
 
         else
@@ -237,7 +246,7 @@ void createAccount()
         printf("\tError opening user details file.\n");
         return;
     }
-    fprintf(file, "%d %s %s %.2f\n", newUser.accountNumber, newUser.username,newUser.phone, newUser.password, newUser.balance);
+    fprintf(file, "%d %s %s %.2f\n", newUser.accountNumber, newUser.username, newUser.phone, newUser.password, newUser.balance);
     fclose(file);
 
     printf("\tAccount created successfully!\n");
