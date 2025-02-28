@@ -13,6 +13,9 @@ struct User
     char password[50];
     char phone[15];
     float balance;
+    char dateOfBirth[11]; // YYYY-MM-DD
+    char address[100];
+    char email[50];
 };
 
 // Function prototypes
@@ -38,7 +41,7 @@ int main()
     struct User currentUser;
     int choice;
     boot();
-mainmenu1:
+System_dash:
     header();
     // Ask for account creation or login
     printf("\t - - SYSTEM DASH - - \n");
@@ -57,7 +60,7 @@ mainmenu1:
 
             printf("\tLogin failed.Try  again with different details.\n\t");
             packt();
-            goto mainmenu1;
+            goto System_dash;
         }
     }
     else if (choice == 2)
@@ -67,7 +70,7 @@ mainmenu1:
 
             printf("\tLogin failed.Try  again with different details.\n\t");
             packt();
-            goto mainmenu1;
+            goto System_dash;
         }
     }
     else if (choice == 3)
@@ -80,7 +83,7 @@ mainmenu1:
         printf("\tInvalid choice\n\n");
         printf("Press any key to continue.");
         getch();
-        goto mainmenu1;
+        goto System_dash;
     }
 
 // Banking menu for logged-in users
@@ -150,7 +153,7 @@ mainmenu2:
             }
             break;
         case 5:
-            goto mainmenu1;
+            goto System_dash;
             break;
         case 6:
             printf("\tExiting the program. Goodbye!\n");
@@ -191,7 +194,7 @@ void createAccount()
     while (1)
     {
         printf("\tEnter your full name: ");
-        scanf("%s", newUser.username); //%[^\n]
+        scanf("%[^\n]", newUser.username); //%[^\n]
         if (isValidUsername(newUser.username) != 1)
         {
             printf("Error! \n");
@@ -201,26 +204,67 @@ void createAccount()
             break;
     }
     bflus();
-    f = fopen("userdetail.txt", "r");
-    if (f != NULL)
-    {
-
-        while (fscanf(f, "%d %s %s %s %f", &temp.accountNumber, temp.username, temp.phone, temp.password, &temp.balance) != EOF)
-        {
-            if (strcmp(temp.phone, newUser.phone) == 0)
-            {
-                printf("With this phone the account already exist\n");
-                fclose(f);
-                return;
-            }
-        }
-        fclose(f);
-    }
-    // Get valid phone number
-    printf("\tEnter your phone number: ");
-    scanf("%s", newUser.phone);
+    // Get user date of birth
+    printf("\tEnter your date of birth (YYYY-MM-DD): ");
+    scanf("%s", newUser.dateOfBirth);
     bflus();
-  
+
+    // Get user address
+    while (1)
+    {
+        printf("\tEnter your address: ");
+        scanf("%[^\n]", newUser.address);
+        bflus();
+        if (strlen(newUser.address) == 0 || strlen(newUser.address) > 99)
+        {
+            printf("Error! Address cannot be empty and must be less than 100 characters.\n");
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    // Get user email
+    printf("\tEnter your email: ");
+    scanf("%s", newUser.email);
+    bflus();
+
+        // Get valid phone number and check for duplicates
+    while (1)
+    {
+        printf("\tEnter your phone number: ");
+        scanf("%s", newUser.phone);
+        bflus();
+
+        // Check if phone number already exists
+        f = fopen("userdetail.txt", "r");
+        int phoneExists = 0;
+        if (f != NULL)
+        {
+            while (fscanf(f, "%d %s %s %s %f", &temp.accountNumber, temp.username, temp.phone, temp.password, &temp.balance) != EOF)
+            {
+                if (strcmp(temp.phone, newUser.phone) == 0)
+                {
+                    phoneExists = 1;
+                    break;
+                }
+            }
+            fclose(f);
+        }
+
+        if (phoneExists)
+        {
+            printf("An account with this phone number already exists. Try entering with a different phone number.\n");
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    bflus();
+
     while (1)
     {
 
@@ -246,7 +290,7 @@ void createAccount()
         printf("\tError opening user details file.\n");
         return;
     }
-    fprintf(file, "%d %s %s %.2f\n", newUser.accountNumber, newUser.username, newUser.phone, newUser.password, newUser.balance);
+    fprintf(file, "%d %s %s %s %.2f %s %s %s\n", newUser.accountNumber, newUser.username, newUser.phone, newUser.password, newUser.balance, newUser.dateOfBirth, newUser.address, newUser.email);
     fclose(file);
 
     printf("\tAccount created successfully!\n");
