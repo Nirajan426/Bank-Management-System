@@ -19,8 +19,8 @@ struct User
 };
 
 // Function prototypes
-void packt();
-void bflus();
+void continueKey();
+void Bufferflush();
 void header();
 void boot();
 void viewinfo(struct User *user);
@@ -51,7 +51,7 @@ System_dash:
 
     printf("\tEnter your choice: ");
     scanf("%d", &choice);
-    bflus();
+    Bufferflush();
     if (choice == 1)
     {
         createAccount();
@@ -59,7 +59,7 @@ System_dash:
         {
 
             printf("\tLogin failed.Try  again with different details.\n\t");
-            packt();
+            continueKey();
             goto System_dash;
         }
     }
@@ -69,7 +69,7 @@ System_dash:
         {
 
             printf("\tLogin failed.Try  again with different details.\n\t");
-            packt();
+            continueKey();
             goto System_dash;
         }
     }
@@ -101,7 +101,7 @@ mainmenu2:
         printf("\t6. Exit\n");
         printf("\tEnter your choice: ");
         scanf("%d", &choice);
-        bflus();
+        Bufferflush();
 
         switch (choice)
         {
@@ -126,7 +126,7 @@ mainmenu2:
                 printf("\t5. Back\n");
                 printf("\tEnter your choice: ");
                 scanf("%d", &choice);
-                bflus();
+                Bufferflush();
                 switch (choice)
                 {
                 case 1:
@@ -181,7 +181,7 @@ void createAccount()
     f = fopen("userdetail.txt", "r");
     if (f != NULL)
     {
-        while (fscanf(f, "%d %s %s %s %f", &newUser.accountNumber, newUser.username, newUser.phone, newUser.password, &newUser.balance) != EOF)
+        while (fscanf(file, "%d %s %s %s %.2f %s %s %s\n", &newUser.accountNumber, newUser.username, newUser.phone, newUser.password, &newUser.balance, newUser.dateOfBirth, newUser.address, newUser.email) != EOF)
         {
             lastAccNo = newUser.accountNumber;
         }
@@ -194,7 +194,7 @@ void createAccount()
     while (1)
     {
         printf("\tEnter your full name: ");
-        scanf("%[^\n]", newUser.username); //%[^\n]
+        scanf("%s", newUser.username); //%[^\n]
         if (isValidUsername(newUser.username) != 1)
         {
             printf("Error! \n");
@@ -203,46 +203,36 @@ void createAccount()
         else
             break;
     }
-    bflus();
+    Bufferflush();
+
     // Get user date of birth
-    printf("\tEnter your date of birth (YYYY-MM-DD): ");
+    printf("\tEnter your date of birth in BS (YYYY-MM-DD): ");
     scanf("%s", newUser.dateOfBirth);
-    bflus();
+    Bufferflush();
 
     // Get user address
-    while (1)
-    {
-        printf("\tEnter your address: ");
-        scanf("%[^\n]", newUser.address);
-        bflus();
-        if (strlen(newUser.address) == 0 || strlen(newUser.address) > 99)
-        {
-            printf("Error! Address cannot be empty and must be less than 100 characters.\n");
-        }
-        else
-        {
-            break;
-        }
-    }
+    printf("\tEnter your address: ");
+    scanf("%s", newUser.address);
+    Bufferflush();
 
     // Get user email
     printf("\tEnter your email: ");
     scanf("%s", newUser.email);
-    bflus();
+    Bufferflush();
 
-        // Get valid phone number and check for duplicates
+    // Get valid phone number and check for duplicates
     while (1)
     {
         printf("\tEnter your phone number: ");
         scanf("%s", newUser.phone);
-        bflus();
+        Bufferflush();
 
         // Check if phone number already exists
         f = fopen("userdetail.txt", "r");
         int phoneExists = 0;
         if (f != NULL)
         {
-            while (fscanf(f, "%d %s %s %s %f", &temp.accountNumber, temp.username, temp.phone, temp.password, &temp.balance) != EOF)
+            while (fscanf(file, "%d %s %s %s %.2f %s %s %s\n", &temp.accountNumber, temp.username, temp.phone, temp.password, &temp.balance, temp.dateOfBirth, temp.address, temp.email) != EOF)
             {
                 if (strcmp(temp.phone, newUser.phone) == 0)
                 {
@@ -263,8 +253,6 @@ void createAccount()
         }
     }
 
-    bflus();
-
     while (1)
     {
 
@@ -279,7 +267,7 @@ void createAccount()
             break;
     }
 
-    bflus();
+    Bufferflush();
 
     newUser.accountNumber = lastAccNo + 1;
     newUser.balance = 0.0;
@@ -319,16 +307,16 @@ int login(struct User *user)
 
     printf("\tEnter your account number: ");
     scanf("%d", &accountNumber);
-    bflus();
+    Bufferflush();
     printf("\tEnter your username: ");
     scanf("%s", username);
-    bflus();
+    Bufferflush();
     printf("\tEnter your password: ");
     scanf("%s", password);
-    bflus();
+    Bufferflush();
 
     // Search for the user in the file
-    while (fscanf(file, "%d %s %s %f", &user->accountNumber, user->username, user->password, &user->balance) != EOF)
+    while (fscanf(file, "%d %s %s %s %.2f %s %s %s\n", &user->accountNumber, user->username, user->phone, user->password, &user->balance, user->dateOfBirth, user->address, user->email) != EOF)
     {
         if (user->accountNumber == accountNumber && strcmp(user->username, username) == 0 && strcmp(user->password, password) == 0)
         {
@@ -349,7 +337,7 @@ void depositMoney(struct User *user)
 
     printf("\tEnter the amount to deposit: ");
     scanf("%f", &amount);
-    bflus();
+    Bufferflush();
 
     if (amount <= 0)
     {
@@ -361,7 +349,7 @@ void depositMoney(struct User *user)
 
     user->balance += amount;
     printf("\tDeposit successful. New balance: %.2f\n", user->balance);
-    packt();
+    continueKey();
     // Log the transaction
     logTransaction(user->accountNumber, "DEPOSIT", amount, user->balance);
 
@@ -377,31 +365,31 @@ void withdrawMoney(struct User *user)
 
     printf("\tEnter the amount to withdraw: ");
     scanf("%f", &amount);
-    bflus();
+    Bufferflush();
 
     if (amount <= 0)
     {
         printf("\tInvalid amount. Please enter a positive value.\n");
-        packt();
+        continueKey();
         return;
     }
 
     if (amount > user->balance)
     {
         printf("\tInsufficient balance.\n");
-        packt();
+        continueKey();
         return;
     }
 
     user->balance -= amount;
     printf("\tWithdrawal successful. New balance: %.2f\n", user->balance);
-    packt();
+    continueKey();
     // Log the transaction
     logTransaction(user->accountNumber, "WITHDRAW", amount, user->balance);
 
     // Update user balance in the file
     updateUserBalance(user);
-    packt();
+    continueKey();
 }
 
 // Function to display account statement (only for the logged-in user)
@@ -413,7 +401,7 @@ void accountStatement(struct User *user)
     if (file == NULL)
     {
         printf("\tNo transactions found.\n");
-        packt();
+        continueKey();
         return;
     }
 
@@ -436,7 +424,7 @@ void accountStatement(struct User *user)
             printf("\t%s %s %.2f \t %s  %.2f\n", date, time, amount, activity, balance);
         }
     }
-    packt();
+    continueKey();
 }
 
 // Function to log transactions
@@ -449,7 +437,7 @@ void logTransaction(int accountNumber, const char *type, float amount, float bal
     if (file == NULL)
     {
         printf("\tError opening transaction log file.\n");
-        packt();
+        continueKey();
         return;
     }
 
@@ -475,18 +463,18 @@ void updateUserBalance(struct User *user)
     if (file == NULL || tempFile == NULL)
     {
         printf("\tError updating user balance.\n");
-        packt();
         return;
     }
 
     struct User tempUser;
-    while (fscanf(file, "%d %s %s %f", &tempUser.accountNumber, tempUser.username, tempUser.password, &tempUser.balance) != EOF)
+
+    while (fscanf(file, "%d %s %s %s %.2f %s %s %s\n", &tempUser.accountNumber, tempUser.username, tempUser.phone, tempUser.password, &tempUser.balance, tempUser.dateOfBirth, tempUser.address, tempUser.email)==8)
     {
         if (tempUser.accountNumber == user->accountNumber)
         {
             tempUser.balance = user->balance;
         }
-        fprintf(tempFile, "%d %s %s %.2f\n", tempUser.accountNumber, tempUser.username, tempUser.password, tempUser.balance);
+        fprintf(tempFile, "%d %s %s %s %.2f %s %s %s\n", tempUser.accountNumber, tempUser.username, tempUser.phone, tempUser.password, tempUser.balance, tempUser.dateOfBirth, tempUser.address, tempUser.email);
     }
 
     fclose(file);
@@ -497,14 +485,14 @@ void updateUserBalance(struct User *user)
 }
 
 // Press any key to continue
-void packt()
+void continueKey()
 {
     printf("\tPress any key to continue.");
     getch();
 }
 
 // Buffer Flush
-void bflus()
+void Bufferflush()
 {
     // Buffer Flush
     int ch;
