@@ -117,8 +117,9 @@ mainmenu2:
         case 4:
             while (1)
             {
+                header();
 
-                printf("\t - - - SETTINGS - - - \n");
+                printf("\t \n- - - SETTINGS - - - \n");
                 printf("\t1.Personal Information \n");
                 printf("\t2. Change Password\n");
                 printf("\t3. Change Email\n");
@@ -193,11 +194,11 @@ void createAccount()
     // Getting user Full name
     while (1)
     {
-        printf("\tEnter your full name: ");
+        printf("\tEnter your full name (Capatilized): ");
         scanf("%s", newUser.username); //%[^\n]
         if (isValidUsername(newUser.username) != 1)
         {
-            printf("Error! \n");
+            printf("Error! Invalid username. Please try again.\n");
         }
 
         else
@@ -260,7 +261,7 @@ void createAccount()
         scanf("%s", newUser.password);
         if (isValidPassword(newUser.password) != 1)
         {
-            printf("\tError! Too weak password. Try again.\n");
+            printf("\tError! Too weak password. Try again.\n\tNote:Password should be at least 8 character long and should consist of least 1 uppercase, 1 lowercase, 1 digit and 1 special character.\n");
         }
 
         else
@@ -467,18 +468,27 @@ void updateUserBalance(struct User *user)
     }
 
     struct User tempUser;
-
-    while (fscanf(file, "%d %s %s %s %.2f %s %s %s\n", &tempUser.accountNumber, tempUser.username, tempUser.phone, tempUser.password, &tempUser.balance, tempUser.dateOfBirth, tempUser.address, tempUser.email)==8)
+    int userFound = 0;
+    while (fscanf(file, "%d %s %s %s %.2f %s %s %s\n", &tempUser.accountNumber, tempUser.username, tempUser.phone, tempUser.password, &tempUser.balance, tempUser.dateOfBirth, tempUser.address, tempUser.email) == 8)
     {
         if (tempUser.accountNumber == user->accountNumber)
         {
             tempUser.balance = user->balance;
+            userFound = 1; // User found
         }
         fprintf(tempFile, "%d %s %s %s %.2f %s %s %s\n", tempUser.accountNumber, tempUser.username, tempUser.phone, tempUser.password, tempUser.balance, tempUser.dateOfBirth, tempUser.address, tempUser.email);
     }
 
     fclose(file);
     fclose(tempFile);
+
+    // Checking if user is found?
+    if (!userFound)
+    {
+        printf("\tUser not found. Balance update failed.\n");
+        remove("temp.txt"); // Remove temp file if user not found
+        return;
+    }
 
     remove("userdetail.txt");
     rename("temp.txt", "userdetail.txt");
@@ -536,7 +546,7 @@ void boot()
 int isValidPassword(char *password)
 {
     int length = 0, hasUpper = 0, hasLower = 0, hasDigit = 0, hasSpecial = 0;
-    char specialChars[] = "@$!%*?&";
+    char specialChars[] = "@$!#*?&";
 
     length = strlen(password);
     if (length < 8)
@@ -560,28 +570,47 @@ int isValidUsername(char *username)
 {
     int length = strlen(username);
 
-    // Check length (5-15 charters)
-    if (length < 5 || length > 40 || (isalpha(username[0]) != 1))
+    // Check length (5-15 characters)
+    if (length < 5 || length > 15)
     {
         return 0;
     }
-    return 1; // Valid username
-}
 
+    // Check if all characters are alphabetic (A-Z, a-z)
+    for (int i = 0; i < length; i++)
+    {
+        if (!isalpha(username[i]))
+        {
+            return 0; // Invalid username
+        }
+
+        return 1; // Valid username
+    }
+}
 // not completed.........................
 void viewinfo(struct User *user)
 {
+    header();
     printf("Hello");
 }
 void changePassword(struct User *user)
 {
-    printf("Opps! Comming soon...");
+    system("cls");
+    header();
+    printf("Opps , this function is not completed yet");
+   
 }
 void changeEmail(struct User *user)
 {
-    printf("Opps! Comming soon...");
+   system("cls");
+    header();
+    printf("Opps , this function is not completed yet");
+   
 }
 void changePhoneNumber(struct User *user)
 {
-    printf("Opps! Comming soon...");
+   system("cls");
+    header();
+    printf("Opps , this function is not completed yet");
+   
 }
