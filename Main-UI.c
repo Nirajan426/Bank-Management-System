@@ -13,14 +13,12 @@ struct User
     char password[50];
     char phone[15];
     float balance;
-    char dateOfBirth[11]; // YYYY-MM-DD
+    char dateOfBirth[11];
     char address[100];
     char email[50];
 };
 
 // Function prototypes
-void continueKey();
-void Bufferflush();
 void header();
 void boot();
 void viewinfo(struct User *user);
@@ -36,6 +34,9 @@ void logTransaction(int accountNumber, const char *type, float amount, float bal
 void updateUserBalance(struct User *user);
 int isValidUsername(char *username);
 int isValidPassword(char *password);
+void lowercase(char str[]);
+void continueKey();
+void Bufferflush();
 int main()
 {
     struct User currentUser;
@@ -57,7 +58,6 @@ System_dash:
         createAccount();
         if (login(&currentUser) != 1) // 1 for success and 0 for fail
         {
-
             printf("\tLogin failed.Try  again with different details.\n\t");
             continueKey();
             goto System_dash;
@@ -67,7 +67,6 @@ System_dash:
     {
         if (login(&currentUser) != 1) // 1 for success and 0 for fail
         {
-
             printf("\tLogin failed.Try  again with different details.\n\t");
             continueKey();
             goto System_dash;
@@ -75,6 +74,7 @@ System_dash:
     }
     else if (choice == 3)
     {
+        printf("\tThank you! Visit us again.\n");
         exit(0);
     }
 
@@ -157,7 +157,7 @@ mainmenu2:
             goto System_dash;
             break;
         case 6:
-            printf("\tExiting the program. Goodbye!\n");
+            printf("\tThank you! Visit us again.\n");
             exit(0);
         default:
             printf("\tInvalid choice. Please try again.\n");
@@ -194,11 +194,13 @@ void createAccount()
     // Getting user Full name
     while (1)
     {
-        printf("\tEnter your full name (Capatilized): ");
+        printf("\tEnter your full name: ");
         scanf("%s", newUser.username); //%[^\n]
+        lowercase(newUser.username);                       // converting username to lowercase
+
         if (isValidUsername(newUser.username) != 1)
         {
-            printf("Error! Invalid username. Please try again.\n");
+            printf("Error!. Please try again.\n Note: Username must be 5 - 30 characters long and must contain only letters.\n");
         }
 
         else
@@ -214,9 +216,12 @@ void createAccount()
     // Get user address
     printf("\tEnter your address: ");
     scanf("%s", newUser.address);
+    lowercase(newUser.address);
+
     Bufferflush();
 
-    // Get user email
+    // Get user email1
+
     printf("\tEnter your email: ");
     scanf("%s", newUser.email);
     Bufferflush();
@@ -233,11 +238,15 @@ void createAccount()
         int phoneExists = 0;
         if (f != NULL)
         {
-            while (fscanf(file, "%d %s %s %s %.2f %s %s %s\n", &temp.accountNumber, temp.username, temp.phone, temp.password, &temp.balance, temp.dateOfBirth, temp.address, temp.email) != EOF)
+            while (fscanf(f, "%d %s %s %s %.2f %s %s %s\n", &temp.accountNumber, temp.username, temp.phone, temp.password, &temp.balance, temp.dateOfBirth, temp.address, temp.email) != EOF)
             {
                 if (strcmp(temp.phone, newUser.phone) == 0)
                 {
                     phoneExists = 1;
+                    break;
+                }
+                else
+                {
                     break;
                 }
             }
@@ -253,6 +262,8 @@ void createAccount()
             break;
         }
     }
+
+    // Getting Password...
 
     while (1)
     {
@@ -309,9 +320,12 @@ int login(struct User *user)
     printf("\tEnter your account number: ");
     scanf("%d", &accountNumber);
     Bufferflush();
+
     printf("\tEnter your username: ");
     scanf("%s", username);
+    // lowercase(username);
     Bufferflush();
+    
     printf("\tEnter your password: ");
     scanf("%s", password);
     Bufferflush();
@@ -571,7 +585,7 @@ int isValidUsername(char *username)
     int length = strlen(username);
 
     // Check length (5-15 characters)
-    if (length < 5 || length > 15)
+    if (length < 5 || length > 30)
     {
         return 0;
     }
@@ -587,6 +601,11 @@ int isValidUsername(char *username)
         return 1; // Valid username
     }
 }
+void lowercase(char str[]) {
+    for (int i = 0; str[i] != '\0'; i++) {
+        str[i] = tolower(str[i]);
+    }
+}
 // not completed.........................
 void viewinfo(struct User *user)
 {
@@ -598,19 +617,16 @@ void changePassword(struct User *user)
     system("cls");
     header();
     printf("Opps , this function is not completed yet");
-   
 }
 void changeEmail(struct User *user)
 {
-   system("cls");
+    system("cls");
     header();
     printf("Opps , this function is not completed yet");
-   
 }
 void changePhoneNumber(struct User *user)
 {
-   system("cls");
+    system("cls");
     header();
     printf("Opps , this function is not completed yet");
-   
 }
