@@ -554,9 +554,9 @@ void boot()
     for (int i = 0; i < 62; i++)
     {
         printf("_");
-        usleep(1000);
+        sleep(0.1);
     }
-    usleep(100000);
+    sleep(0.1);
 }
 int isValidPassword(char *password)
 {
