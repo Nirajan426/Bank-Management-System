@@ -35,6 +35,9 @@ void logTransaction(int accountNumber, const char *type, float amount, float bal
 void updateUserBalance(struct User *user);
 int isValidUsername(char *username);
 int isValidPassword(char *password);
+int isValidDateFormat(char *date);
+int isValidPhoneNumber(char *phoneNumber);
+int isValidEmail(char *email);
 void lowercase(char str[]);
 void continueKey();
 void Bufferflush();
@@ -176,16 +179,19 @@ void createAccount()
     struct User newUser, temp;
     FILE *file;
     FILE *f;
-    int lastAccNo = 1000;
+    int lastAccNo = 12345678;
     header();
 
     // Open the user details file to find the last account number
     f = fopen("userdetail.txt", "r");
     if (f != NULL)
     {
-        while (fscanf(f, "%d %s %s %s %.2f %s %s %s", &newUser.accountNumber, newUser.username, newUser.phone, newUser.password, &newUser.balance, newUser.dateOfBirth, newUser.address, newUser.email) ==8)
+        while (fscanf(f, "%d %s %s %s %f %s %s %s", &newUser.accountNumber, newUser.username, newUser.phone, newUser.password, &newUser.balance, newUser.dateOfBirth, newUser.address, newUser.email) != EOF)
         {
-            lastAccNo = newUser.accountNumber;
+            if (newUser.accountNumber > lastAccNo)
+            {
+                lastAccNo = newUser.accountNumber;
+            }
         }
 
         fclose(f);
@@ -210,29 +216,82 @@ void createAccount()
     Bufferflush();
 
     // Get user date of birth
-    printf("\tEnter your date of birth in BS (YYYY-MM-DD): ");
-    scanf("%s", newUser.dateOfBirth);
-    Bufferflush();
+    while (1)
+    {
+        printf("\tEnter your date of birth in BS (YYYY-MM-DD): ");
+        scanf("%s", newUser.dateOfBirth);
+        Bufferflush();
+        if (isValidDateFormat(newUser.dateOfBirth) != 1)
+        {
+            printf("Error!. Ensure date format is same as mentioned\n");
+        }
+        else
+        {
+            break;
+        }
+    }
 
-    // Get user address
+ // Get user address
+while (1)
+{
     printf("\tEnter your address: ");
     scanf("%s", newUser.address);
+    Bufferflush();
     lowercase(newUser.address);
 
-    Bufferflush();
+    // Check if the address contains only alphanumeric characters
+    int isValid = 1;  // Flag to check validity
+    for (int i = 0; i < strlen(newUser.address); i++)
+    {
+        if (!isalnum(newUser.address[i]))
+        {
+            isValid = 0;  
+            break;
+        }
+    }
+    if (isValid) 
+    {
+        break;  // Address is valid
+    }
+    else
+    {
+        printf("Error! Address must contain only alphanumeric characters. Please try again.\n");
+    }
+}
 
     // Get user email1
-
-    printf("\tEnter your email: ");
-    scanf("%s", newUser.email);
-    Bufferflush();
+    while (1)
+    {
+        printf("\tEnter your email: ");
+        scanf("%s", newUser.email);
+        Bufferflush();
+        if (isValidEmail(newUser.email) != 1)
+        {
+            printf("Error ! due to invalid email format\n");
+        }
+        else
+        {
+            break;
+        }
+    }
 
     // Get valid phone number and check for duplicates
     while (1)
     {
-        printf("\tEnter your phone number: ");
-        scanf("%s", newUser.phone);
-        Bufferflush();
+        while (1)
+        {
+            printf("\tEnter your phone number: ");
+            scanf("%s", newUser.phone);
+            Bufferflush();
+            if (isValidPhoneNumber(newUser.phone) != 1)
+            {
+                printf("Erro! due to invalid phone number\n");
+            }
+            else
+            {
+                break;
+            }
+        }
 
         // Check if phone number already exists
         f = fopen("userdetail.txt", "r");
@@ -246,7 +305,6 @@ void createAccount()
                     phoneExists = 1;
                     break;
                 }
-            
             }
             fclose(f);
         }
@@ -283,7 +341,7 @@ void createAccount()
     newUser.balance = 0.0;
 
     // Save user details to file
-    file=fopen("userdetail.txt", "a"); // opening file in append mode
+    file = fopen("userdetail.txt", "a"); // opening file in append mode
     if (file == NULL)
     {
         printf("\tError opening user details file.\n");
@@ -598,6 +656,63 @@ int isValidUsername(char *username)
 
         return 1; // Valid username
     }
+}
+int isValidDateFormat(char *date)
+{
+    if (strlen(date) != 10) // Check length
+        return 0;
+    for (int i = 0; i < 10; i++) // Check if characters are digits or '-'
+    {
+        if ((i == 4 || i == 7))
+        {
+            if (date[i] != '-')
+                return 0; // Ensure dashes at the right places
+        }
+        else
+        {
+            if (!isdigit(date[i]))
+                return 0; // Ensure numbers only
+        }
+    }
+    return 1; // Valid format
+}
+int isValidPhoneNumber(char *phoneNumber)
+{
+    // Check if the phone number has exactly 10 digits
+    if (strlen(phoneNumber) != 10)
+    {
+        return 0; // Invalid if length is not 10
+    }
+
+    // Check if the first two digits are 97 or 98
+    if (phoneNumber[0] != '9' || (phoneNumber[1] != '7' && phoneNumber[1] != '8'))
+    {
+        return 0; // Invalid if it does not start with 97 or 98
+    }
+
+    // Check if all characters are digits
+    for (int i = 0; i < 10; i++)
+    {
+        if (!isdigit(phoneNumber[i]))
+        {
+            return 0; // Invalid if any character is not a digit
+        }
+    }
+
+    return 1; // Valid phone number
+}
+int isValidEmail(char *email)
+{
+    int count_Atrate = 0, count_Dot = 0;
+    int len = strlen(email); // Get the length of the email
+    for (int i = 0; i < len; i++)
+    {
+        if (email[i] == '@')
+            count_Atrate++;
+        if (email[i] == '.')
+            count_Dot++;
+    }
+    return (count_Atrate && count_Dot); //&&-> logical AND //It will return 1 if both counts has 1 value
 }
 void lowercase(char str[])
 {
