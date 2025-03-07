@@ -174,7 +174,7 @@ mainmenu2:
 void createAccount()
 {
     struct User newUser, temp;
-    FILE *file = fopen("userdetail.txt", "a");
+    FILE *file;
     FILE *f;
     int lastAccNo = 1000;
     header();
@@ -183,7 +183,7 @@ void createAccount()
     f = fopen("userdetail.txt", "r");
     if (f != NULL)
     {
-        while (fscanf(file, "%d %s %s %s %.2f %s %s %s\n", &newUser.accountNumber, newUser.username, newUser.phone, newUser.password, &newUser.balance, newUser.dateOfBirth, newUser.address, newUser.email) != EOF)
+        while (fscanf(f, "%d %s %s %s %.2f %s %s %s", &newUser.accountNumber, newUser.username, newUser.phone, newUser.password, &newUser.balance, newUser.dateOfBirth, newUser.address, newUser.email) ==8)
         {
             lastAccNo = newUser.accountNumber;
         }
@@ -197,7 +197,7 @@ void createAccount()
     {
         printf("\tEnter your full name: ");
         scanf("%s", newUser.username); //%[^\n]
-        lowercase(newUser.username);                       // converting username to lowercase
+        lowercase(newUser.username);   // converting username to lowercase
 
         if (isValidUsername(newUser.username) != 1)
         {
@@ -239,17 +239,14 @@ void createAccount()
         int phoneExists = 0;
         if (f != NULL)
         {
-            while (fscanf(f, "%d %s %s %s %.2f %s %s %s\n", &temp.accountNumber, temp.username, temp.phone, temp.password, &temp.balance, temp.dateOfBirth, temp.address, temp.email) != EOF)
+            while (fscanf(f, "%d %s %s %s %f %s %s %s\n", &temp.accountNumber, temp.username, temp.phone, temp.password, &temp.balance, temp.dateOfBirth, temp.address, temp.email) != EOF)
             {
                 if (strcmp(temp.phone, newUser.phone) == 0)
                 {
                     phoneExists = 1;
                     break;
                 }
-                else
-                {
-                    break;
-                }
+            
             }
             fclose(f);
         }
@@ -286,6 +283,7 @@ void createAccount()
     newUser.balance = 0.0;
 
     // Save user details to file
+    file=fopen("userdetail.txt", "a"); // opening file in append mode
     if (file == NULL)
     {
         printf("\tError opening user details file.\n");
@@ -313,8 +311,7 @@ int login(struct User *user)
     if (file == NULL)
     {
         printf("\tNo user accounts found. Please create an account first.\n");
-        printf("Press any key to continue.");
-        getch();
+        continueKey();
         return 0;
     }
 
@@ -324,15 +321,15 @@ int login(struct User *user)
 
     printf("\tEnter your username: ");
     scanf("%s", username);
-    // lowercase(username);
+    lowercase(username);
     Bufferflush();
-    
+
     printf("\tEnter your password: ");
     scanf("%s", password);
     Bufferflush();
 
     // Search for the user in the file
-    while (fscanf(file, "%d %s %s %s %.2f %s %s %s\n", &user->accountNumber, user->username, user->phone, user->password, &user->balance, user->dateOfBirth, user->address, user->email) != EOF)
+    while (fscanf(file, "%d %s %s %s %f %s %s %s", &user->accountNumber, user->username, user->phone, user->password, &user->balance, user->dateOfBirth, user->address, user->email) != EOF)
     {
         if (user->accountNumber == accountNumber && strcmp(user->username, username) == 0 && strcmp(user->password, password) == 0)
         {
@@ -602,8 +599,10 @@ int isValidUsername(char *username)
         return 1; // Valid username
     }
 }
-void lowercase(char str[]) {
-    for (int i = 0; str[i] != '\0'; i++) {
+void lowercase(char str[])
+{
+    for (int i = 0; str[i] != '\0'; i++)
+    {
         str[i] = tolower(str[i]);
     }
 }
