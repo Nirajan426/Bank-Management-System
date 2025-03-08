@@ -889,6 +889,79 @@ void changeEmail(struct User *user)
 void changePhoneNumber(struct User *user)
 {
     system("cls");
+    char currentPhone[50], newPhone[50], confirmPhone[50];
+    FILE *file, *tempFile;
+    struct User tempUser;
+    int found = 0;
     header();
-    printf("Opps , this function is not completed yet");
+
+    printf("\tEnter your current PhoneNumber: ");
+    scanf("%s", currentPhone);
+    Bufferflush();
+    if (strcmp(user->phone,currentPhone) != 0)
+    {
+        printf("\tIncorrect PhoneNumber!\n");
+        continueKey();
+        return;
+    }
+    while (1)
+    {
+        printf("\tEnter new PhoneNumber: ");
+        scanf("%s", newPhone);
+        Bufferflush();
+
+        if (!isValidPhoneNumber(newPhone))
+        {
+            printf("Error ! due to invalid Phone number format\n");
+            continue;
+        }
+
+        printf("\tConfirm new Phone: ");
+        scanf("%s", confirmPhone);
+        Bufferflush();
+
+        if (strcmp(newPhone, confirmPhone) != 0)
+        {
+            printf("\tPhoneNumber do not match! Try again.\n");
+        }
+        else
+        {
+            break;
+        }
+    }
+    file = fopen("userdetail.txt", "r");
+    tempFile = fopen("temp.txt", "w");
+    if (file == NULL || tempFile == NULL)
+    {
+        printf("\tError updating Phone Number.\n");
+        return;
+    }
+
+    while (fscanf(file, "%d %s %s %s %f %s %s %s\n", &tempUser.accountNumber, tempUser.username, tempUser.phone, tempUser.password, &tempUser.balance, tempUser.dateOfBirth, tempUser.address, tempUser.email) == 8)
+    {
+        if (tempUser.accountNumber == user->accountNumber)
+        {
+            strcpy(tempUser.phone, newPhone);
+            strcpy(user->phone, newPhone);
+            found = 1;
+        }
+        fprintf(tempFile, "%d %s %s %s %.2f %s %s %s\n", tempUser.accountNumber, tempUser.username, tempUser.phone, tempUser.password, tempUser.balance, tempUser.dateOfBirth, tempUser.address, tempUser.email);
+    }
+
+    fclose(file);
+    fclose(tempFile);
+
+    if (!found)
+    {
+        printf("\tUser not found. Phone Number update failed.\n");
+        remove("temp.txt");
+    }
+    else
+    {
+        remove("userdetail.txt");
+        rename("temp.txt", "userdetail.txt");
+        printf("\tPhone Number changed successfully!\n");
+    }
+
+    continueKey();
 }
