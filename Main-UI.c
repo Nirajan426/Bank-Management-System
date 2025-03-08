@@ -740,16 +740,12 @@ void changePassword(struct User *user)
     printf("\tEnter your current password: ");
     scanf("%s", currentPassword);
     Bufferflush();
-
-    // Check if the entered password matches the existing one
     if (strcmp(user->password, currentPassword) != 0)
     {
         printf("\tIncorrect password!\n");
         continueKey();
         return;
     }
-
-    // Get the new password
     while (1)
     {
         printf("\tEnter new password: ");
@@ -775,8 +771,6 @@ void changePassword(struct User *user)
             break;
         }
     }
-
-    // Open the file to update the password
     file = fopen("userdetail.txt", "r");
     tempFile = fopen("temp.txt", "w");
     if (file == NULL || tempFile == NULL)
