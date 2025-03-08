@@ -810,8 +810,81 @@ void changePassword(struct User *user)
 void changeEmail(struct User *user)
 {
     system("cls");
+    char currentEmail[50], newEmail[50], confirmEmail[50];
+    FILE *file, *tempFile;
+    struct User tempUser;
+    int found = 0;
     header();
-    printf("Opps , this function is not completed yet");
+
+    printf("\tEnter your current Email: ");
+    scanf("%s", currentEmail);
+    Bufferflush();
+    if (strcmp(user->email, currentEmail) != 0)
+    {
+        printf("\tIncorrect Email!\n");
+        continueKey();
+        return;
+    }
+    while (1)
+    {
+        printf("\tEnter new Email: ");
+        scanf("%s", newEmail);
+        Bufferflush();
+
+        if (!isValidEmail(newEmail))
+        {
+            printf("Error ! due to invalid email format\n");
+            continue;
+        }
+
+        printf("\tConfirm new Email: ");
+        scanf("%s", confirmEmail);
+        Bufferflush();
+
+        if (strcmp(newEmail, confirmEmail) != 0)
+        {
+            printf("\tEmail do not match! Try again.\n");
+        }
+        else
+        {
+            break;
+        }
+    }
+    file = fopen("userdetail.txt", "r");
+    tempFile = fopen("temp.txt", "w");
+    if (file == NULL || tempFile == NULL)
+    {
+        printf("\tError updating Email.\n");
+        return;
+    }
+
+    while (fscanf(file, "%d %s %s %s %f %s %s %s\n", &tempUser.accountNumber, tempUser.username, tempUser.phone, tempUser.password, &tempUser.balance, tempUser.dateOfBirth, tempUser.address, tempUser.email) == 8)
+    {
+        if (tempUser.accountNumber == user->accountNumber)
+        {
+            strcpy(tempUser.email, newEmail);
+            strcpy(user->email, newEmail);
+            found = 1;
+        }
+        fprintf(tempFile, "%d %s %s %s %.2f %s %s %s\n", tempUser.accountNumber, tempUser.username, tempUser.phone, tempUser.password, tempUser.balance, tempUser.dateOfBirth, tempUser.address, tempUser.email);
+    }
+
+    fclose(file);
+    fclose(tempFile);
+
+    if (!found)
+    {
+        printf("\tUser not found. Email update failed.\n");
+        remove("temp.txt");
+    }
+    else
+    {
+        remove("userdetail.txt");
+        rename("temp.txt", "userdetail.txt");
+        printf("\tEmail changed successfully!\n");
+    }
+
+    continueKey();
 }
 void changePhoneNumber(struct User *user)
 {
