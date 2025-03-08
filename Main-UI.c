@@ -730,8 +730,88 @@ void viewinfo(struct User *user)
 void changePassword(struct User *user)
 {
     system("cls");
+    char currentPassword[50], newPassword[50], confirmPassword[50];
+    FILE *file, *tempFile;
+    struct User tempUser;
+    int found = 0;
+
     header();
-    printf("Opps , this function is not completed yet");
+
+    printf("\tEnter your current password: ");
+    scanf("%s", currentPassword);
+    Bufferflush();
+
+    // Check if the entered password matches the existing one
+    if (strcmp(user->password, currentPassword) != 0)
+    {
+        printf("\tIncorrect password!\n");
+        continueKey();
+        return;
+    }
+
+    // Get the new password
+    while (1)
+    {
+        printf("\tEnter new password: ");
+        scanf("%s", newPassword);
+        Bufferflush();
+
+        if (!isValidPassword(newPassword))
+        {
+            printf("\tError! Too weak password. Try again.\n\tNote: Password should be at least 8 characters long and contain at least 1 uppercase, 1 lowercase, 1 digit, and 1 special character.\n");
+            continue;
+        }
+
+        printf("\tConfirm new password: ");
+        scanf("%s", confirmPassword);
+        Bufferflush();
+
+        if (strcmp(newPassword, confirmPassword) != 0)
+        {
+            printf("\tPasswords do not match! Try again.\n");
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    // Open the file to update the password
+    file = fopen("userdetail.txt", "r");
+    tempFile = fopen("temp.txt", "w");
+    if (file == NULL || tempFile == NULL)
+    {
+        printf("\tError updating password.\n");
+        return;
+    }
+
+    while (fscanf(file, "%d %s %s %s %f %s %s %s\n", &tempUser.accountNumber, tempUser.username, tempUser.phone, tempUser.password, &tempUser.balance, tempUser.dateOfBirth, tempUser.address, tempUser.email) == 8)
+    {
+        if (tempUser.accountNumber == user->accountNumber)
+        {
+            strcpy(tempUser.password, newPassword);
+            strcpy(user->password, newPassword);
+            found = 1;
+        }
+        fprintf(tempFile, "%d %s %s %s %.2f %s %s %s\n", tempUser.accountNumber, tempUser.username, tempUser.phone, tempUser.password, tempUser.balance, tempUser.dateOfBirth, tempUser.address, tempUser.email);
+    }
+
+    fclose(file);
+    fclose(tempFile);
+
+    if (!found)
+    {
+        printf("\tUser not found. Password update failed.\n");
+        remove("temp.txt");
+    }
+    else
+    {
+        remove("userdetail.txt");
+        rename("temp.txt", "userdetail.txt");
+        printf("\tPassword changed successfully!\n");
+    }
+
+    continueKey();
 }
 void changeEmail(struct User *user)
 {
