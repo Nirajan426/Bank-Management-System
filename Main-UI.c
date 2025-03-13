@@ -85,8 +85,7 @@ System_dash:
     else
     {
         printf("\tInvalid choice\n\n");
-        printf("Press any key to continue.");
-        getch();
+        continueKey();
         goto System_dash;
     }
 
@@ -152,8 +151,7 @@ mainmenu2:
                 default:
 
                     printf("\tInvalid choice. Please try again.\n");
-                    printf("Press any key to continue.");
-                    getch();
+                    continueKey();
                 }
             }
             break;
