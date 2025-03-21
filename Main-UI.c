@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <unistd.h>
+#include <windows.h>
 #include <stdio.h>
 #include <time.h>
 #include <ctype.h>
@@ -21,18 +21,26 @@ struct User
 
 // Function prototypes
 void header();
-void boot();
+void boot(); // Boot Graphics
+void exitAnimation();
+
+// User-Info Management
 void viewinfo(struct User *user);
-void changePassword(struct User *user);    // yet to program this code
-void changeEmail(struct User *user);       // yet to program this code
-void changePhoneNumber(struct User *user); // yet to program this code
+void changePassword(struct User *user);
+void changeEmail(struct User *user);
+void changePhoneNumber(struct User *user);
 void createAccount();
 int login(struct User *user);
+
+// Banking Functions
 void depositMoney(struct User *user);
 void withdrawMoney(struct User *user);
+void transferMoney(struct User *user);
 void accountStatement(struct User *user);
 void logTransaction(int accountNumber, const char *type, float amount, float balance);
 void updateUserBalance(struct User *user);
+
+// Input Validation
 int isValidUsername(char *username);
 int isValidPassword(char *password);
 int isValidDateFormat(char *date);
@@ -41,19 +49,26 @@ int isValidEmail(char *email);
 void lowercase(char str[]);
 void continueKey();
 void Bufferflush();
+void encryptPassword(char *password, int key); // password mask using(*)
+
+// Main function
 int main()
 {
     struct User currentUser;
     int choice;
     boot();
+
 System_dash:
     header();
     // Ask for account creation or login
-    printf("\t - - SYSTEM DASH - - \n");
-    printf("\t1. Create Account\n");
-    printf("\t2. Login\n");
-    printf("\t3. Exit\n");
-
+    printf("\n\t\t\t - - *** NAMASTE *** - - \n\n");
+    Sleep(1000);
+    printf("\t1. Create a Bank Account\n");
+    Sleep(400);
+    printf("\t2. Already Have An Accont? -> Login\n");
+    Sleep(400);
+    printf("\t3. Exit Bank\n\n");
+    Sleep(700);
     printf("\tEnter your choice: ");
     scanf("%d", &choice);
     Bufferflush();
@@ -78,30 +93,31 @@ System_dash:
     }
     else if (choice == 3)
     {
-        printf("\tThank you! Visit us again.\n");
-        exit(0);
+        // printf("\tThank you! Visit us again.\n");
+        exitAnimation();
     }
 
     else
     {
         printf("\tInvalid choice\n\n");
-        continueKey();
+        printf("Press any key to continue.");
+        getch();
         goto System_dash;
     }
 
-// Banking menu for logged-in users
-mainmenu2:
+    // Banking menu for logged-in users
+Customer_dash:
     while (1)
     {
         header();
-        printf("\t - - - HOME - - - \n");
-        printf("\nWelcome, %s!\n", currentUser.username);
-        printf("\t1. Deposit Money\n");
-        printf("\t2. Withdraw Money\n");
-        printf("\t3. Account Statement\n");
-        printf("\t4. Setting\n");
-        printf("\t5. Log Out\n");
-        printf("\t6. Exit\n");
+        printf("\nWelcome, %s!\t\t\tCurrent Balance::NPR %.2f \n\n", currentUser.username, currentUser.balance);
+        printf("\t1 --> Deposit\n");
+        printf("\t2 --> Withdraw\n");
+        printf("\t3 --> Transfer \n");
+        printf("\t4 --> Transactions\n");
+        printf("\t5 --> Setting\n");
+        printf("\t6 --> Log Out\n");
+        printf("\t7 --> Exit\n\n");
         printf("\tEnter your choice: ");
         scanf("%d", &choice);
         Bufferflush();
@@ -115,19 +131,23 @@ mainmenu2:
             withdrawMoney(&currentUser);
             break;
         case 3:
-            accountStatement(&currentUser);
+            transferMoney(&currentUser);
             break;
         case 4:
+            accountStatement(&currentUser);
+            break;
+        case 5:
             while (1)
             {
                 header();
 
-                printf("\t \n- - - SETTINGS - - - \n");
-                printf("\t1.Personal Information \n");
-                printf("\t2. Change Password\n");
-                printf("\t3. Change Email\n");
-                printf("\t4. Change Phone Number\n");
-                printf("\t5. Back\n");
+                printf(" \n\t\t\t- - - SETTINGS - - - \n\n");
+                printf("\t1 --> Personal Information \n");
+                printf("\t2 --> Change Password\n");
+                printf("\t3 --> Change Email\n");
+                printf("\t4 --> Change Phone Number\n");
+                printf("\t5 --> Back\n\n");
+                Sleep(600);
                 printf("\tEnter your choice: ");
                 scanf("%d", &choice);
                 Bufferflush();
@@ -147,20 +167,21 @@ mainmenu2:
                     break;
 
                 case 5:
-                    goto mainmenu2;
+                    goto Customer_dash;
                 default:
 
                     printf("\tInvalid choice. Please try again.\n");
-                    continueKey();
+                    printf("Press any key to continue.");
+                    getch();
                 }
             }
             break;
-        case 5:
+        case 6:
             goto System_dash;
             break;
-        case 6:
+        case 7:
             printf("\tThank you! Visit us again.\n");
-            exit(0);
+            exitAnimation();
         default:
             printf("\tInvalid choice. Please try again.\n");
             printf("Press any key to continue.");
@@ -199,13 +220,13 @@ void createAccount()
     // Getting user Full name
     while (1)
     {
-        printf("\tEnter your full name: ");
+        printf("\tEnter your username : ");
         scanf("%s", newUser.username); //%[^\n]
         lowercase(newUser.username);   // converting username to lowercase
 
         if (isValidUsername(newUser.username) != 1)
         {
-            printf("Error!. Please try again.\n Note: Username must be 5 - 30 characters long and must contain only letters.\n");
+            printf("\tInvalid username! Please try again. \nNote: Username must be 5-30 characters long and contain only letters.\n");
         }
 
         else
@@ -221,7 +242,7 @@ void createAccount()
         Bufferflush();
         if (isValidDateFormat(newUser.dateOfBirth) != 1)
         {
-            printf("Error!. Ensure date format is same as mentioned\n");
+            printf("\tError! Ensure the date format is YYYY-MM-DD.\n");
         }
         else
         {
@@ -229,43 +250,72 @@ void createAccount()
         }
     }
 
- // Get user address
-while (1)
-{
-    printf("\tEnter your address: ");
-    scanf("%s", newUser.address);
-    Bufferflush();
-    lowercase(newUser.address);
-
-    // Check if the address contains only alphanumeric characters
-    int isValid = 1;  // Flag to check validity
-    for (int i = 0; i < strlen(newUser.address); i++)
-    {
-        if (!isalnum(newUser.address[i]))
-        {
-            isValid = 0;  
-            break;
-        }
-    }
-    if (isValid) 
-    {
-        break;  // Address is valid
-    }
-    else
-    {
-        printf("Error! Address must contain only alphanumeric characters. Please try again.\n");
-    }
-}
-
-    // Get user email1
+    // Get user address
     while (1)
     {
-        printf("\tEnter your email: ");
-        scanf("%s", newUser.email);
+        printf("\tEnter your address: ");
+        scanf("%s", newUser.address);
         Bufferflush();
-        if (isValidEmail(newUser.email) != 1)
+        lowercase(newUser.address);
+
+        // Check if the address contains only alphanumeric characters
+        int isValid = 1; // Flag to check validity
+        for (int i = 0; i < strlen(newUser.address); i++)
         {
-            printf("Error ! due to invalid email format\n");
+            if (!isalnum(newUser.address[i]))
+            {
+                isValid = 0;
+                break;
+            }
+        }
+        if (isValid)
+        {
+            break; // Address is valid
+        }
+        else
+        {
+            printf("\tError! Address must contain only alphanumeric characters. Please try again.\n");
+        }
+    }
+
+    // Get valid email and check for duplicates
+
+    while (1)
+    {
+        while (1)
+        {
+            printf("\tEnter your email: ");
+            scanf("%s", newUser.email);
+            Bufferflush();
+            if (isValidEmail(newUser.email) != 1)
+            {
+                printf("\tError! Invalid email format.\n");
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        // Check if email already exists
+        f = fopen("userdetail.txt", "r");
+        int emailExists = 0;
+        if (f != NULL)
+        {
+            while (fscanf(f, "%d %s %s %s %f %s %s %s\n", &temp.accountNumber, temp.username, temp.phone, temp.password, &temp.balance, temp.dateOfBirth, temp.address, temp.email) != EOF)
+            {
+                if (strcmp(temp.email, newUser.email) == 0)
+                {
+                    emailExists = 1;
+                    break;
+                }
+            }
+            fclose(f);
+        }
+
+        if (emailExists)
+        {
+            printf("\tError! An account with this email already exists. Please try a different email.\n");
         }
         else
         {
@@ -283,7 +333,7 @@ while (1)
             Bufferflush();
             if (isValidPhoneNumber(newUser.phone) != 1)
             {
-                printf("Erro! due to invalid phone number\n");
+                printf("\tError! Invalid phone number\n");
             }
             else
             {
@@ -309,7 +359,7 @@ while (1)
 
         if (phoneExists)
         {
-            printf("An account with this phone number already exists. Try entering with a different phone number.\n");
+            printf("\tAn account with this phone number already exists. Try entering with a different phone number.\n");
         }
         else
         {
@@ -318,15 +368,14 @@ while (1)
     }
 
     // Getting Password...
-
     while (1)
     {
-
-        printf("\tEnter a valid and strong password: ");
-        scanf("%s", newUser.password);
+        encryptPassword(newUser.password, 1); // key==1
         if (isValidPassword(newUser.password) != 1)
         {
-            printf("\tError! Too weak password. Try again.\n\tNote:Password should be at least 8 character long and should consist of least 1 uppercase, 1 lowercase, 1 digit and 1 special character.\n");
+            printf("\tError! Too weak password. Try again.\n");
+            printf("\tNote: Password should contain at least 8 characters, ");
+            printf("1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character.\n");
         }
 
         else
@@ -338,6 +387,7 @@ while (1)
     newUser.accountNumber = lastAccNo + 1;
     newUser.balance = 0.0;
 
+    
     // Save user details to file
     file = fopen("userdetail.txt", "a"); // opening file in append mode
     if (file == NULL)
@@ -348,9 +398,14 @@ while (1)
     fprintf(file, "%d %s %s %s %.2f %s %s %s\n", newUser.accountNumber, newUser.username, newUser.phone, newUser.password, newUser.balance, newUser.dateOfBirth, newUser.address, newUser.email);
     fclose(file);
 
+    printf("\n\t\t Please wait! Your data is being processed....\n");
+    Sleep(600);
+    printf("\t\t Almost there....\n\n");
+    Sleep(400);
+
     printf("\tAccount created successfully!\n");
     printf("\tYour account number is: %d\n", newUser.accountNumber);
-    printf("Press any key to procced to Login Page.");
+    printf("\nPress any key to procced to Login Page.");
     getch();
 }
 
@@ -361,6 +416,7 @@ int login(struct User *user)
     int accountNumber;
     char username[50];
     char password[50];
+
     FILE *file = fopen("userdetail.txt", "r");
     header();
 
@@ -379,10 +435,11 @@ int login(struct User *user)
     scanf("%s", username);
     lowercase(username);
     Bufferflush();
-
-    printf("\tEnter your password: ");
-    scanf("%s", password);
-    Bufferflush();
+    
+//Getting password from user
+    encryptPassword(password,4); //key 4 // encryption while entering password
+    printf("\n\t\tPlease wait....\n");
+    Sleep(700);
 
     // Search for the user in the file
     while (fscanf(file, "%d %s %s %s %f %s %s %s", &user->accountNumber, user->username, user->phone, user->password, &user->balance, user->dateOfBirth, user->address, user->email) != EOF)
@@ -458,7 +515,77 @@ void withdrawMoney(struct User *user)
 
     // Update user balance in the file
     updateUserBalance(user);
-    continueKey();
+}
+
+void transferMoney(struct User *user)
+{
+    float amount;
+    int receiverAccNo;
+    FILE *file = fopen("userdetail.txt", "r");
+    header();
+    while (1)
+    {
+        printf("\tEnter the account number to transfer to: ");
+        scanf("%d", &receiverAccNo);
+        Bufferflush();
+        printf("\tEnter the amount to transfer: ");
+        scanf("%f", &amount);
+        Bufferflush();
+        if (amount <= 0)
+        {
+            printf("\tInvalid amount. Please enter a positive value.\n");
+            continueKey();
+            return;
+        }
+
+        if (amount > user->balance)
+        {
+            printf("\tInsufficient balance.\n");
+            continueKey();
+            return;
+        }
+        if (receiverAccNo == user->accountNumber)
+        {
+            printf("Transaction failed! You cannot transfer money to your own account.");
+            continueKey();
+            return;
+        }
+        // Checking whether the receiver account exists
+        struct User receiver;
+        int userFound = 0;
+        while (fscanf(file, "%d %s %s %s %f %s %s %s", &receiver.accountNumber, receiver.username, receiver.phone, receiver.password, &receiver.balance, receiver.dateOfBirth, receiver.address, receiver.email) != EOF)
+        {
+            if (receiver.accountNumber == receiverAccNo)
+            {
+                userFound = 1;
+                break;
+            }
+        }
+        fclose(file);
+
+        if (!userFound)
+        {
+            printf("\tReceiver account does not exist.\n");
+            continueKey();
+            return;
+        }
+
+        // Update balances
+        user->balance -= amount;
+        receiver.balance += amount;
+
+        // Log the transaction
+        logTransaction(user->accountNumber, "TRANSFER", amount, user->balance);
+        logTransaction(receiver.accountNumber, "RECEIVE", amount, receiver.balance);
+
+        // Update user balances in the file
+        updateUserBalance(user);
+        updateUserBalance(&receiver);
+
+        printf("\tTransfer successful! New balance: %.2f\n", user->balance);
+        continueKey();
+        return;
+    }
 }
 
 // Function to display account statement (only for the logged-in user)
@@ -475,7 +602,7 @@ void accountStatement(struct User *user)
     }
 
     printf("\n\tAccount Statement for Account Number: %d\n", user->accountNumber);
-    printf("\t Date       Time     Amount      Activity   Balance\n");
+    printf("\t Date       Time     Amount      Activity   Balance\n\n");
 
     char line[100];
     while (fgets(line, sizeof(line), file))
@@ -537,7 +664,7 @@ void updateUserBalance(struct User *user)
 
     struct User tempUser;
     int userFound = 0;
-    while (fscanf(file, "%d %s %s %s %.2f %s %s %s\n", &tempUser.accountNumber, tempUser.username, tempUser.phone, tempUser.password, &tempUser.balance, tempUser.dateOfBirth, tempUser.address, tempUser.email) == 8)
+    while (fscanf(file, "%d %s %s %s %f %s %s %s\n", &tempUser.accountNumber, tempUser.username, tempUser.phone, tempUser.password, &tempUser.balance, tempUser.dateOfBirth, tempUser.address, tempUser.email) != EOF)
     {
         if (tempUser.accountNumber == user->accountNumber)
         {
@@ -565,7 +692,7 @@ void updateUserBalance(struct User *user)
 // Press any key to continue
 void continueKey()
 {
-    printf("\tPress any key to continue.");
+    printf("\n\tPress any key to continue.");
     getch();
 }
 
@@ -583,34 +710,98 @@ void header()
 {
     system("cls");
     printf("\n");
-    printf("\t\t\t|| NAM BANK ||\n");
-    printf("\n");
-    printf("\t---------- Bank Management System ----------");
-    // printf("\n====================================================");
-    printf("\n\t___________________________________________________________");
-    printf("\n");
+    printf("\t\t################################################\n");
+    printf("\t\t#                                              #\n");
+    printf("\t\t#        ***  WELCOME TO NKB BANK  ***         #\n");
+    printf("\t\t#                                    Pvt. Ltd. #\n");
+    printf("\t\t################################################\n");
+    printf("\n\t-------------------------------------------------------\n");
+}
+// Exit animation
+void exitAnimation()
+{
+    system("cls");
+
+    printf("\n\n\n\n\n\n\n\n");
+
+    printf("\t\t         THANK YOU FOR USING NKB BANK           \n");
+    printf("\t\t                                                \n");
+    printf("\t\t        Visit Us Again For More Services        \n\n");
+    printf("\t\t        For more information, contact us at     \n");
+    printf("\t\t         +234 813 123 4569                      \n");
+    printf("\t\t         Email: nkb.bank@gmail.com              \n");
+    printf("\t\t         Website: nkbbank.com                   \n\n");
+    printf("\t#######################################################################\n");
+
+    Sleep(3);
+    printf("\n\n(Press any key to exit.)");
+    getch();
+    system("cls"); // Wait before closing
+    exit(0);
 }
 
 // boot graphics
 void boot()
 {
     printf("\n\n\n\n");
-    printf("\t\t\tNNNN    N  AAAAA  M    M      BBBBB    AAAAA  NNNN    N  K   K\n");
-    printf("\t\t\tN   N   N  A   A  MM  MM      B    B   A   A  N   N   N  K  K\n");
-    printf("\t\t\tN    N  N  AAAAA  M MM M      BBBBB    AAAAA  N    N  N  KK\n");
-    printf("\t\t\tN     N N  A   A  M    M      B    B   A   A  N     N N  K  K\n");
-    printf("\t\t\tN      NN  A   A  M    M      BBBBB    A   A  N      NN  K   K\n");
-    printf("\n\n\t\t\t\t\t\tWELCOMES YOU!\n\n");
-    sleep(1);
-    printf("\t\t\t");
+    printf("\t\tNNNN    N  K   K  BBBBB      BBBBB    AAAAA  NNNN    N  K   K\n");
+    printf("\t\tN   N   N  K  K   B    B     B    B   A   A  N   N   N  K  K\n");
+    printf("\t\tN    N  N  KK     BBBBB      BBBBB    AAAAA  N    N  N  KK\n");
+    printf("\t\tN     N N  K  K   B    B     B    B   A   A  N     N N  K  K\n");
+    printf("\t\tN      NN  K   K  BBBBB      BBBBB    A   A  N      NN  K   K\n");
+    printf("\n\n\t\t\t\t\tWELCOMES YOU!\n\n");
+    Sleep(100);
+    printf("\t\t");
 
     for (int i = 0; i < 62; i++)
     {
         printf("_");
-        sleep(0.1);
+        Sleep(7);
     }
-    sleep(0.1);
+    Sleep(100);
 }
+// for login and create account
+void encryptPassword(char *password, int key)
+{
+    char ch;
+    int i = 0;
+    if (key == 1)
+    {
+        printf("\tEnter valid and strong password: ");
+    }
+    else if (key == 2)
+    {
+        printf("\tEnter current password: ");
+    }
+    else if (key == 3)
+    {
+        printf("\n\tEnter new password: ");
+    }
+    else if (key == 4)
+    {
+        printf("\tEnter your password: ");
+    }
+    else
+    {
+        printf("\n\tEnter cofirm password: ");
+    }
+    while (1)
+    {
+        ch = getch(); // Read character without displaying it
+        if (ch == 13) // Enter key (ASCII 13)
+            break;
+        if (ch == 8 && i > 0)
+        {                    // Handle backspace
+            printf("\b \b"); // Move cursor back, print space, move back again
+            i--;
+            continue;
+        }
+        password[i++] = ch;
+        printf("*"); // Show '*' instead of actual character
+    }
+    password[i] = '\0'; // Null-terminate string
+}
+
 int isValidPassword(char *password)
 {
     int length = 0, hasUpper = 0, hasLower = 0, hasDigit = 0, hasSpecial = 0;
@@ -719,11 +910,22 @@ void lowercase(char str[])
         str[i] = tolower(str[i]);
     }
 }
-// not completed.........................
 void viewinfo(struct User *user)
 {
+    system("cls");
     header();
-    printf("Hello");
+    printf("\t\t\t** Personal details ***\n");
+    printf("\tAccount Number: %d\n", user->accountNumber);
+    printf("\tName: %s\n", user->username);
+    printf("\tPhone no.: %s\n", user->phone);
+    printf("\tPassword: %s\n", user->password);
+    printf("\tEmail: %s\n", user->email);
+    printf("\tBalance: NPR %.2f\n", user->balance);
+    printf("\tDOB: %s BS\n", user->dateOfBirth);
+    printf("\tAddress: %s\n", user->address);
+    printf("\tEmail: %s\n\n", user->email);
+    // Sleep(3);
+    continueKey();
 }
 void changePassword(struct User *user)
 {
@@ -734,10 +936,8 @@ void changePassword(struct User *user)
     int found = 0;
 
     header();
-
-    printf("\tEnter your current password: ");
-    scanf("%s", currentPassword);
-    Bufferflush();
+    // Getting current password from user
+    encryptPassword(currentPassword, 2); // key==2
     if (strcmp(user->password, currentPassword) != 0)
     {
         printf("\tIncorrect password!\n");
@@ -746,20 +946,16 @@ void changePassword(struct User *user)
     }
     while (1)
     {
-        printf("\tEnter new password: ");
-        scanf("%s", newPassword);
-        Bufferflush();
-
+        // Getting new password from user
+        encryptPassword(newPassword, 3); // key==3
         if (!isValidPassword(newPassword))
         {
             printf("\tError! Too weak password. Try again.\n\tNote: Password should be at least 8 characters long and contain at least 1 uppercase, 1 lowercase, 1 digit, and 1 special character.\n");
             continue;
         }
 
-        printf("\tConfirm new password: ");
-        scanf("%s", confirmPassword);
-        Bufferflush();
-
+        // Getting confirm password from user
+        encryptPassword(confirmPassword, 5); // key==4
         if (strcmp(newPassword, confirmPassword) != 0)
         {
             printf("\tPasswords do not match! Try again.\n");
@@ -800,7 +996,7 @@ void changePassword(struct User *user)
     {
         remove("userdetail.txt");
         rename("temp.txt", "userdetail.txt");
-        printf("\tPassword changed successfully!\n");
+        printf("\n\tPassword changed successfully!\n");
     }
 
     continueKey();
@@ -809,8 +1005,8 @@ void changeEmail(struct User *user)
 {
     system("cls");
     char currentEmail[50], newEmail[50], confirmEmail[50];
-    FILE *file, *tempFile;
-    struct User tempUser;
+    FILE *file, *f, *tempFile;
+    struct User tempUser, temp;
     int found = 0;
     header();
 
@@ -825,29 +1021,60 @@ void changeEmail(struct User *user)
     }
     while (1)
     {
-        printf("\tEnter new Email: ");
-        scanf("%s", newEmail);
-        Bufferflush();
-
-        if (!isValidEmail(newEmail))
+        while (1)
         {
-            printf("Error ! due to invalid email format\n");
-            continue;
-        }
 
+            printf("\tEnter new Email: ");
+            scanf("%s", newEmail);
+            Bufferflush();
+
+            if (!isValidEmail(newEmail))
+            {
+                printf("Error ! due to invalid email format\n");
+                continue;
+            }
+
+            // Check if email already exists for other account number
+            f = fopen("userdetail.txt", "r");
+            int emailExists = 0;
+            if (f != NULL)
+            {
+                while (fscanf(f, "%d %s %s %s %f %s %s %s\n", &temp.accountNumber, temp.username, temp.phone, temp.password, &temp.balance, temp.dateOfBirth, temp.address, temp.email) != EOF)
+                {
+                    if (strcmp(temp.email, newEmail) == 0)
+                    {
+                        emailExists = 1;
+                        break;
+                    }
+                }
+                fclose(f);
+            }
+
+            if (emailExists)
+            {
+                printf("Error ! An account with this email already exists.\n");
+            }
+            else
+            {
+                break;
+            }
+        }
         printf("\tConfirm new Email: ");
         scanf("%s", confirmEmail);
         Bufferflush();
 
         if (strcmp(newEmail, confirmEmail) != 0)
         {
-            printf("\tEmail do not match! Try again.\n");
+            printf("Error! Email do not match! Try again.\n");
+            continue;
         }
         else
         {
+
             break;
         }
     }
+    // Updating the new email in userdetail.txt
     file = fopen("userdetail.txt", "r");
     tempFile = fopen("temp.txt", "w");
     if (file == NULL || tempFile == NULL)
@@ -888,15 +1115,15 @@ void changePhoneNumber(struct User *user)
 {
     system("cls");
     char currentPhone[50], newPhone[50], confirmPhone[50];
-    FILE *file, *tempFile;
-    struct User tempUser;
+    FILE *file, *f, *tempFile;
+    struct User tempUser, temp;
     int found = 0;
     header();
 
     printf("\tEnter your current PhoneNumber: ");
     scanf("%s", currentPhone);
     Bufferflush();
-    if (strcmp(user->phone,currentPhone) != 0)
+    if (strcmp(user->phone, currentPhone) != 0)
     {
         printf("\tIncorrect PhoneNumber!\n");
         continueKey();
@@ -904,29 +1131,60 @@ void changePhoneNumber(struct User *user)
     }
     while (1)
     {
-        printf("\tEnter new PhoneNumber: ");
-        scanf("%s", newPhone);
-        Bufferflush();
-
-        if (!isValidPhoneNumber(newPhone))
+        while (1)
         {
-            printf("Error ! due to invalid Phone number format\n");
-            continue;
-        }
 
+            printf("\tEnter new PhoneNumber: ");
+            scanf("%s", newPhone);
+            Bufferflush();
+
+            if (!isValidPhoneNumber(newPhone))
+            {
+                printf("Error ! due to invalid Phone number format\n");
+                continue;
+            }
+
+            // Check if phone number already exists
+            f = fopen("userdetail.txt", "r");
+            int phoneExists = 0;
+            if (f != NULL)
+            {
+                while (fscanf(f, "%d %s %s %s %f %s %s %s\n", &temp.accountNumber, temp.username, temp.phone, temp.password, &temp.balance, temp.dateOfBirth, temp.address, temp.email) != EOF)
+                {
+                    if (strcmp(temp.phone, newPhone) == 0)
+                    {
+                        phoneExists = 1;
+                        break;
+                    }
+                }
+                fclose(f);
+            }
+
+            if (phoneExists)
+            {
+                printf("Error! An account with this phone number already exists.\n");
+            }
+            else
+            {
+                break;
+            }
+        }
         printf("\tConfirm new Phone: ");
         scanf("%s", confirmPhone);
         Bufferflush();
 
         if (strcmp(newPhone, confirmPhone) != 0)
         {
+
             printf("\tPhoneNumber do not match! Try again.\n");
+            continue;
         }
         else
         {
             break;
         }
     }
+    // updating new phone number in userdetail.txt
     file = fopen("userdetail.txt", "r");
     tempFile = fopen("temp.txt", "w");
     if (file == NULL || tempFile == NULL)
