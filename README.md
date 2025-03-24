@@ -57,34 +57,6 @@ This project is a Bank Management System that simulates core banking operations 
 - Validation Functions → `isValidEmail()`, `isValidPassword()`, etc.
 - File Handling → `updateUserBalance()`, `logTransaction()`
 
-## 🎥 Demo
-**Login Screen**
-
-################################################
-#                                              #
-#        ***  WELCOME TO NKB BANK  ***         #
-#                                    Pvt. Ltd. #
-################################################
--------------------------------------------------------
-
-          - - *** NAMASTE *** - - 
-
-1. Create a Bank Account
-2. Already Have An Accont? -> Login
-3. Exit Bank
-
-**Banking Dashboard**
-
-Welcome, [Username]!      Current Balance: NPR 5000.00
-
-1 --> Deposit
-2 --> Withdraw
-3 --> Transfer 
-4 --> Transactions
-5 --> Settings
-6 --> Log Out
-7 --> Exit
-
 ## 🤝 Contributing
 Feel free to fork, improve, and submit PRs!
 
