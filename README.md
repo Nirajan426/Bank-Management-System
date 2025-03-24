@@ -1,37 +1,63 @@
-# Bank Management System 🏦
+# Bank Management System
+A console-based banking application built in C.
 
-A simple Bank Management System in C that allows users to create accounts, log in, deposit, withdraw money, and view their transaction history.
+## 📌 Overview
+This project is a Bank Management System that simulates core banking operations like account creation, deposits, withdrawals, and fund transfers. It features a menu-driven interface, input validation, and transaction logging for secure banking operations.
 
-### Features 🚀
-- ✅ **User Registration** – Create a new bank account
-- ✅ **User Login** – Secure authentication with account number and password
-- ✅ **Deposit Money** – Add funds to your account
-- ✅ **Withdraw Money** – Withdraw funds with balance checks
-- ✅ **Transaction History** – View past transactions
-- ✅ **Account Balance Updates** – Automatically updates after each transaction
+## ✨ Features
 
-### How It Works 🔄
+### 🔐 Account Management
+- ✅ **Create a new bank account** (with validation for username, password, email, etc.)
+- 🔑 **Secure login** (Account Number + Username + Password)
+- 👤 **View & Modify Profile** (Update password, email, phone number)
 
-When you **run the program**, it first displays a welcome screen with two options:  
-**Create Account** or **Login**.
+### 💰 Banking Operations
+- 💵 **Deposit Money** (Add funds to account)
+- 💸 **Withdraw Money** (Check balance before withdrawal)
+- 🔄 **Transfer Money** (Send money to another account)
+- 📜 **View Transaction History** (Check deposits, withdrawals, transfers)
 
-- If you **select "Create Account"**, the system will ask for a username and password, assign a unique **account number**, and save the details for future access.
-- If you **select "Login"**, you must enter your **account number, username, and password**. If the credentials match, you will be logged in successfully.
+### 🛡️ Security & Validation
+- 🔒 **Password encryption** (hidden input with `*` masking)
+- 📝 **Input validation** (Email, phone number, date format, password strength)
+- 📂 **File-based storage** (User details & transactions stored in `.txt` files)
 
-Once logged in, you can perform the following actions:
+## 🛠️ How to Run
 
-- ✅ **Deposit Money** – Add funds to your account.
-- ✅ **Withdraw Money** – Withdraw funds if you have enough balance.
-- ✅ **View Account Statement** – Check your transaction history, including deposits and withdrawals.
-- ✅ **Exit** – Log out and close the program.
+### Prerequisites
+- A C compiler (e.g., GCC, Clang)
+- Windows OS (uses `<windows.h>` for `Sleep()` and `system("cls")`)
 
-The system securely **updates balances** and **logs transactions** to ensure accuracy and reliability. 🚀
+### Compilation & Execution
 
-### Files Used 📂
-- `userdetail.txt` – Stores user account details
-- `transaction_log.txt` – Stores transaction history
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/yourusername/bank-management-system.git
+    cd bank-management-system
+    ```
 
-### Requirements 🛠
-- C Compiler (e.g., GCC)
-- Standard C libraries (`stdio.h`, `stdlib.h`, `time.h`, `unistd.h`)
+2. Compile the code:
+    ```bash
+    gcc bank_system.c -o bank_system
+    ```
 
+3. Run the program:
+    ```bash
+    ./bank_system
+    ```
+
+## 📂 File Structure
+- `userdetail.txt` → Stores user account details
+- `transaction_log.txt` → Records all transactions
+
+## 📜 Code Structure
+- `struct User` → Stores account details (username, password, balance, etc.)
+- `main()` → Handles login, account creation, and main menu navigation
+- Banking Functions → `depositMoney()`, `withdrawMoney()`, `transferMoney()`
+- Validation Functions → `isValidEmail()`, `isValidPassword()`, etc.
+- File Handling → `updateUserBalance()`, `logTransaction()`
+
+## 🎥 Demo
+(You can add GIFs/screenshots of the program running)
+
+**Login Screen**
